@@ -326,7 +326,7 @@
 (setq auto-save-file-name-transforms `((".*" ,temporary-file-directory t)))
 
 (require 'autopair)
-
+(autopair-global-mode) ;; to enable in all buffers
 (setq lisp-modes '(lisp-mode
                    emacs-lisp-mode
                    common-lisp-mode
