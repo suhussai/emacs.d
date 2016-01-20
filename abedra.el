@@ -52,7 +52,9 @@
                           solarized-theme
                           web-mode
                           writegood-mode
-                          yaml-mode)
+                          yaml-mode
+                          indent-guide
+                          minimap)
   "Default packages")
 
 (defun abedra/packages-installed-p ()
