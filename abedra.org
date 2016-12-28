@@ -58,7 +58,7 @@
      (add-to-list 'package-archives
                   '("melpa" . "http://melpa.milkbox.net/packages/") t)
 
-     (setq package-archive-enable-alist '(("melpa" deft magit)))
+     (setq package-archive-enable-alist '(("melpa" magit f)))
    #+end_src
 *** Define default packages
     :PROPERTIES:
@@ -70,36 +70,23 @@
       (defvar abedra/packages '(ac-slime
                                 auto-complete
                                 autopair
-                                clojure-mode
-                                coffee-mode
-                                csharp-mode
-                                deft
-                                erlang
+                                ess
+                                f
                                 feature-mode
                                 flycheck
-                                gist
                                 go-autocomplete
                                 go-eldoc
                                 go-mode
                                 graphviz-dot-mode
                                 haml-mode
-                                haskell-mode
                                 htmlize
-                                idris-mode
                                 magit
                                 markdown-mode
                                 marmalade
-                                nodejs-repl
-                                o-blog
                                 org
-                                paredit
-                                php-mode
-                                puppet-mode
-                                restclient
+                                powerline
                                 rvm
-                                scala-mode
                                 smex
-                                sml-mode
                                 solarized-theme
                                 web-mode
                                 writegood-mode
@@ -665,6 +652,53 @@
         (setq-default ispell-program-name "/usr/bin/aspell"))
       (setq-default ispell-list-command "list")
     #+end_src
+*** eshell
+    Customize eshell
+    #+begin_src emacs-lisp
+      (require 'f)
+
+      (setq eshell-visual-commands
+            '("less" "tmux" "htop" "top" "bash" "zsh" "fish"))
+
+      (setq eshell-visual-subcommands
+            '(("git" "log" "l" "diff" "show")))
+
+      ;; Prompt with a bit of help from http://www.emacswiki.org/emacs/EshellPrompt
+      (defmacro with-face (str &rest properties)
+        `(propertize ,str 'face (list ,@properties)))
+
+      (defun eshell/abbr-pwd ()
+        (let ((home (getenv "HOME"))
+              (path (eshell/pwd)))
+          (cond
+           ((string-equal home path) "~")
+           ((f-ancestor-of? home path) (concat "~/" (f-relative path home)))
+           (path))))
+
+      (defun eshell/my-prompt ()
+        (let ((header-bg "#161616"))
+          (concat
+      ;     (with-face user-login-name :foreground "#dc322f")
+      ;     (with-face (concat "@" hostname) :foreground "#268bd2")
+      ;     " "
+           (with-face (eshell/abbr-pwd) :foreground "#008700")
+           (if (= (user-uid) 0)
+               (with-face "#" :foreground "red")
+             (with-face "$" :foreground "#2345ba"))
+           " ")))
+
+      (setq eshell-prompt-function 'eshell/my-prompt)
+      (setq eshell-highlight-prompt nil)
+      (setq eshell-prompt-regexp "^[^#$\n]+[#$] ")
+
+      (setq eshell-cmpl-cycle-completions nil)
+    #+end_src
+*** powerline
+#+begin_src emacs-lisp
+  (require 'powerline)
+  (powerline-default-theme)
+#+end_src
+
 ** Language Hooks
    :PROPERTIES:
    :CUSTOM_ID: languages
@@ -713,7 +747,7 @@
 *** RVM
     Enable Ruby Version Manager mode and tell it to use the default Ruby.
     #+begin_src emacs-lisp
-      (rvm-use-default)
+      ;; (rvm-use-default) ;; This is causing a 1.5 second slow down to startup, disabling for now
     #+end_src
 *** YAML
     Add additional file extensions that trigger =yaml-mode=.
